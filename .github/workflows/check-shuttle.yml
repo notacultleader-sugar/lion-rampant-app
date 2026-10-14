@@ -1,0 +1,27 @@
+name: Check shuttle text on website
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          curl -fsSL https://www.lionrampantpub.com/ -o page.html
+          python3 - <<'PY'
+          import re
+          s=open('page.html').read()
+          out=[]
+          for m in re.finditer(r'(?i)shuttle',s):
+              a=max(0,m.start()-1500); b=m.end()+400
+              out.append(f"--- at char {m.start()} ---\n"+s[a:b])
+          # also list comment blocks and hidden elements mentioning shuttle
+          for c in re.finditer(r'<!--.*?-->',s,re.S):
+              if 'huttle' in c.group(0): out.append(f"=== inside HTML comment at {c.start()}-{c.end()} ===")
+          open('shuttle-check.txt','w').write("\n\n".join(out) or "no shuttle text")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add shuttle-check.txt && git commit -m "Shuttle text check" && git push
