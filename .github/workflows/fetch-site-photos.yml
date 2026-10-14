@@ -1,0 +1,44 @@
+name: Fetch photos from website
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download page, stylesheets and background photos
+        run: |
+          set -u
+          base=https://www.lionrampantpub.com/
+          mkdir -p site-photos && cd site-photos
+          curl -fsSL "$base" -o page.html
+          # stylesheets referenced by the page
+          grep -oiE 'href="[^"]+\.css[^"]*"' page.html | sed -E 's/^href="//;s/"$//' | grep -v '^http' > css.txt || true
+          : > imgs.txt
+          while read -r c; do
+            f=$(basename "${c%%\?*}")
+            curl -fsSL "$base$c" -o "$f" || continue
+            dir=$(dirname "$c")
+            grep -oE 'url\([^)]+\)' "$f" | sed -E "s/url\(['\"]?//;s/['\"]?\)$//" | grep -iE '\.(jpe?g|png|webp)' | while read -r u; do
+              python3 -c "import posixpath,sys;print(posixpath.normpath(posixpath.join(sys.argv[1],sys.argv[2])))" "$dir" "$u" >> imgs.txt
+            done
+          done < css.txt
+          # inline style backgrounds too
+          grep -oE 'url\([^)]+\)' page.html | sed -E "s/url\(['\"&quot;]*//;s/['\"&quot;]*\)$//" >> imgs.txt || true
+          sort -u imgs.txt -o imgs.txt
+          echo "Images referenced by stylesheets:"; cat imgs.txt
+          while read -r p; do curl -fsSL "$base$p" -o "bg-$(basename "$p")" || true; done < imgs.txt
+          rm -f page.html *.css
+          ls -la
+      - name: Commit photos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add site-photos
+          git commit -m "Fetch background photos from lionrampantpub.com" || echo "nothing to commit"
+          git push
