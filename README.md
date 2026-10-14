@@ -2,7 +2,7 @@
 
 A clickable mobile app prototype for [The Lion Rampant Scottish Pub](https://www.lionrampantpub.com/) in Maple Bay, BC.
 
-Open `index.html` in a browser (it looks best at phone width, or framed like a phone on desktop).
+Open `index.html` in a browser. The app runs inside a simulated phone that scales to fit any window.
 
 ## Screens
 
