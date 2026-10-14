@@ -9,6 +9,7 @@ Open `index.html` in a browser. The app runs inside a simulated phone that scale
 - **Home**: live open/closed status from the pub's hours, tonight's special and the week of specials, upcoming events, address and hours.
 - **Menu**: the full menu from the pub's website, with search, section filters and favourites.
 - **Events**: live bands, Music Bingo and Karaoke, with reminders and shuttle info.
+- **Contact & Hours**: today's hours highlighted, kitchen hours, phone and email with copy buttons, Facebook and Instagram, directions, shuttle and house rules.
 - **Gift cards**: sign in with Apple, Google or email; buy a card for yourself or a friend; tap a card to show a scan code at the bar, see the balance and history, or add a code.
 
 ## Prototype notes
