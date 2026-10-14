@@ -1,0 +1,90 @@
+--- at char 27446 ---
+           <a href="assets/img/menu/menu63view.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Teriyaki Chicken & Pineapple Wrap"><i class="bx bx-plus"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6 portfolio-item filter-appies">
+            <img src="assets/img/menu/menu64.jpg" class="img-fluid" alt="">
+            <div class="portfolio-info">
+              <h4>The Cluck Stops Here Buffalo Chicken Dip</h4>
+              <p>Appies</p>
+              <a href="assets/img/menu/menu64view.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="The Cluck Stops Here Buffalo Chicken Dip"><i class="bx bx-plus"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6 portfolio-item filter-handheld">
+            <img src="assets/img/menu/menu58.jpg" class="img-fluid" alt="">
+            <div class="portfolio-info">
+              <h4>Blackened Tuna Fish Tacos</h4>
+              <p>Handheld</p>
+              <a href="assets/img/menu/menu58view.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Blackened Tuna Fish Tacos"><i class="bx bx-plus"></i></a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section><!-- End Menu Section -->
+
+    <!-- ======= Cta Section ======= -->
+    <section id="cta" class="cta">
+      <div class="container" data-aos="zoom-in">
+
+        <div class="text-center">
+          <h3>Shuttle Available!</h3>
+          <p> Did you know we offer shuttle service from 6:00pm to close, Fridays & Saturdays as well as on special occasions?<br>Just call us at the pub for pickup & drop off!</p>
+          <a class="cta-btn" href="#contact">Call Us!</a>
+        </div>
+
+      </div>
+    </section><!-- End Cta Section -->
+
+    <!-- ======= Entertainment Section ======= -->
+    <section id="events"
+
+--- at char 27506 ---
+lery="portfolioGallery" class="portfolio-lightbox preview-link" title="Teriyaki Chicken & Pineapple Wrap"><i class="bx bx-plus"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6 portfolio-item filter-appies">
+            <img src="assets/img/menu/menu64.jpg" class="img-fluid" alt="">
+            <div class="portfolio-info">
+              <h4>The Cluck Stops Here Buffalo Chicken Dip</h4>
+              <p>Appies</p>
+              <a href="assets/img/menu/menu64view.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="The Cluck Stops Here Buffalo Chicken Dip"><i class="bx bx-plus"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6 portfolio-item filter-handheld">
+            <img src="assets/img/menu/menu58.jpg" class="img-fluid" alt="">
+            <div class="portfolio-info">
+              <h4>Blackened Tuna Fish Tacos</h4>
+              <p>Handheld</p>
+              <a href="assets/img/menu/menu58view.jpg" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="Blackened Tuna Fish Tacos"><i class="bx bx-plus"></i></a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section><!-- End Menu Section -->
+
+    <!-- ======= Cta Section ======= -->
+    <section id="cta" class="cta">
+      <div class="container" data-aos="zoom-in">
+
+        <div class="text-center">
+          <h3>Shuttle Available!</h3>
+          <p> Did you know we offer shuttle service from 6:00pm to close, Fridays & Saturdays as well as on special occasions?<br>Just call us at the pub for pickup & drop off!</p>
+          <a class="cta-btn" href="#contact">Call Us!</a>
+        </div>
+
+      </div>
+    </section><!-- End Cta Section -->
+
+    <!-- ======= Entertainment Section ======= -->
+    <section id="events" class="services">
+      <div class="container">
+
+        <d
