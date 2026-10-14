@@ -14,6 +14,6 @@ Open `index.html` in a browser. The app runs inside a simulated phone that scale
 ## Prototype notes
 
 - Sign-in and payments are simulated. No account is created, no money is charged and no email is sent.
-- Events come from the pub's website. A GitHub Action (`.github/workflows/sync-events.yml`) runs `scripts/sync_events.py` every 6 hours, reads the events section of lionrampantpub.com and commits any changes to `events.json`. The app loads `events.json` when it opens, so new events appear without touching the app code. Past events are shown under "Recently at the Lion".
+- Events come from the pub's website. A GitHub Action (`.github/workflows/sync-events.yml`) runs `scripts/sync_events.py` every 6 hours, reads the events section of lionrampantpub.com and commits any changes to `events.json`. The app loads `events.json` when it opens, so new events appear without touching the app code. Only upcoming events are shown; past ones drop off automatically.
 - Menu prices are not shown because the website does not list them; daily special prices are real.
 - State (sign-in, cards, favourites, reminders) is saved in the browser's localStorage only.

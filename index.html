@@ -396,7 +396,6 @@ let EVENTS=[
 let EV_UPDATED='2026-10-14';
 const todayISO=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver'}).format(new Date());
 const upcoming=()=>EVENTS.filter(e=>e.date>=todayISO());
-const past=()=>EVENTS.filter(e=>e.date<todayISO()).reverse();
 const NO_DATES=`<div class="summary"><b>New dates coming soon</b><p class="note" style="font-size:14px">There's live music every weekend. The pub hasn't posted its next acts on the website yet, and they'll show up here as soon as it does.</p></div>`;
 const EV_ART={live:'linear-gradient(140deg,#C8102E,#5A0716 70%)',game:'linear-gradient(140deg,#1F6F78,#0E2A3A 70%)'};
 
@@ -457,10 +456,10 @@ function renderMenu(){
 let evFilter='all';
 function renderEvents(){
   const ok=e=>evFilter==='all'||e.kind===evFilter;
-  const list=upcoming().filter(ok), old=past().filter(ok);
+  const list=upcoming().filter(ok);
   const f=list[0];
   $('#feature-event').innerHTML=f?`<div class="feature-event" style="background:${EV_ART[f.kind]}"><span class="chip">${fmt(f.date,{weekday:'long',month:'short',day:'numeric'})}</span><h3>${esc(f.title)}</h3><p>${esc(f.desc)}</p></div>`:NO_DATES;
-  $('#event-list').innerHTML=list.slice(1).map(eventRow).join('')+(old.length?`<p class="eyebrow" style="margin-top:6px">Recently at the Lion</p>`+old.map(eventRow).join(''):'');
+  $('#event-list').innerHTML=list.slice(1).map(eventRow).join('');
   $('#ev-updated').textContent=`Events from lionrampantpub.com · checked ${fmt(EV_UPDATED.slice(0,10),{month:'short',day:'numeric'})}`;
 }
 
