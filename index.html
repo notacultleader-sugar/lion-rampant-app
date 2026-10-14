@@ -336,7 +336,7 @@ body{background:radial-gradient(ellipse at 50% 30%,var(--desk-hi),var(--desk) 70
         <dl class="info-card">
           <dt>Shuttle</dt><dd>Fri & Sat, 6pm to close. Call 250.746.5422 to book pickup and drop-off.</dd>
         </dl>
-        <p class="note">Example dates. The acts are from the pub's website listing.</p>
+        <p class="note" id="ev-updated">Events from lionrampantpub.com</p>
       </div>
     </section>
 
@@ -381,17 +381,23 @@ const MENU={
   'Mains':['Fish & Chips','Classic Mac & Cheese','Chicken Fingers','Powerhouse Bowl']
 };
 const TAGS={'Cullen Skink Dip':'A Scottish smoked-haddock favourite','Scotch Egg':'A pub essential','Wings of Song':'Saturday: a pound for $12','Fish & Chips':'The house classic','New Black Bean Veggie Burger':'Vegetarian','Seafood Chowder':'Made in house','Daily Homemade Soup':'Ask what\'s on today'};
-const EVENTS=[
-  {date:'2026-10-16',title:'Machine Room',kind:'live',desc:'Duo · live music on the weekend'},
-  {date:'2026-10-17',title:'Music Bingo',kind:'game',desc:'Name that tune, win prizes'},
-  {date:'2026-10-23',title:'One Hit Away',kind:'live',desc:'Live band'},
-  {date:'2026-10-24',title:'Karaoke Night',kind:'game',desc:'Grab the mic'},
-  {date:'2026-10-30',title:'Taylor Fance',kind:'live',desc:'Solo set'},
-  {date:'2026-10-31',title:'Music Bingo',kind:'game',desc:'Name that tune, win prizes'},
-  {date:'2026-11-06',title:'P.A. & The Two Tones',kind:'live',desc:'Classic rock'},
-  {date:'2026-11-07',title:'Karaoke Night',kind:'game',desc:'Grab the mic'},
-  {date:'2026-11-13',title:'Renovation Blues Band',kind:'live',desc:'Blues'}
+/* Events as listed on lionrampantpub.com. Replaced at load by events.json when it is served alongside the page (kept fresh by the sync job). */
+let EVENTS=[
+  {date:'2026-07-31',title:'Machine Room',kind:'live',desc:'Fantastic tunes with this duo!'},
+  {date:'2026-08-01',title:'Music Bingo',kind:'game',desc:'Mits spins the tunes & gives away the prizes!'},
+  {date:'2026-08-07',title:'One Hit Away',kind:'live',desc:'These guys know how to Rock!'},
+  {date:'2026-08-08',title:'Karaoke Night',kind:'game',desc:'Mitz hosts a night of amateur music!'},
+  {date:'2026-08-14',title:'Taylor Fance',kind:'live',desc:'Taylor rocks the place, solo!'},
+  {date:'2026-08-15',title:'Music Bingo',kind:'game',desc:'Mits spins the tunes & gives away the prizes!'},
+  {date:'2026-08-21',title:'P.A. & The Two Tones',kind:'live',desc:'Paul & the guys with be #RockinTheRampant, Classic rock-style!'},
+  {date:'2026-08-22',title:'Karaoke Night',kind:'game',desc:'Mitz hosts a night of amateur music!'},
+  {date:'2026-08-28',title:'Renovation Blues Band',kind:'live',desc:'Rock & Blues! Gotta love that!'}
 ];
+let EV_UPDATED='2026-10-14';
+const todayISO=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver'}).format(new Date());
+const upcoming=()=>EVENTS.filter(e=>e.date>=todayISO());
+const past=()=>EVENTS.filter(e=>e.date<todayISO()).reverse();
+const NO_DATES=`<div class="summary"><b>New dates coming soon</b><p class="note" style="font-size:14px">There's live music every weekend. The pub hasn't posted its next acts on the website yet, and they'll show up here as soon as it does.</p></div>`;
 const EV_ART={live:'linear-gradient(140deg,#C8102E,#5A0716 70%)',game:'linear-gradient(140deg,#1F6F78,#0E2A3A 70%)'};
 
 /* ---------- Time / open status (pub time) ---------- */
@@ -420,14 +426,15 @@ function renderHome(){
   $('#special-card').innerHTML=`<span class="eyebrow">${esc(sp.d)} special</span><span class="price">${esc(sp.price)}</span><h3>${esc(sp.name)}</h3><p>${esc(sp.note)}</p>`;
   const order=[1,2,3,4,5,6,0];
   $('#week').innerHTML=order.map(i=>{const s=SPECIALS[i];return `<div class="day${i===day?' today':''}"><span class="eyebrow">${s.d.slice(0,3)}</span><b>${esc(s.name)}</b><span>${esc(s.price)}</span></div>`}).join('');
-  $('#home-events').innerHTML=EVENTS.slice(0,2).map(eventRow).join('');
+  const up=upcoming();
+  $('#home-events').innerHTML=up.length?up.slice(0,2).map(eventRow).join(''):NO_DATES;
 }
 const fmt=(iso,opt)=>new Date(iso+'T12:00:00').toLocaleDateString('en-CA',opt);
 function eventRow(e){
-  const on=(store.get('remind',[])).includes(e.date+e.title);
+  const on=(store.get('remind',[])).includes(e.date+e.title), isPast=e.date<todayISO();
   return `<div class="event-row"><div class="datebox"><small>${fmt(e.date,{month:'short'})}</small><strong>${fmt(e.date,{day:'numeric'})}</strong></div>
-  <div class="event-info"><span class="chip ${e.kind==='live'?'red':''}" style="align-self:flex-start">${e.kind==='live'?'Live':'Game night'}</span><h3>${esc(e.title)}</h3><p>${fmt(e.date,{weekday:'long'})} evening · ${esc(e.desc)}</p></div>
-  <button class="remind" aria-pressed="${on}" aria-label="Remind me about ${esc(e.title)}" data-remind="${esc(e.date+e.title)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg></button></div>`;
+  <div class="event-info"><span class="chip ${e.kind==='live'&&!isPast?'red':''}" style="align-self:flex-start">${isPast?'Past':e.kind==='live'?'Live':'Game night'}</span><h3>${esc(e.title)}</h3><p>${fmt(e.date,{weekday:'long'})} · ${esc(e.desc)}</p></div>
+  ${isPast?'':`<button class="remind" aria-pressed="${on}" aria-label="Remind me about ${esc(e.title)}" data-remind="${esc(e.date+e.title)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg></button>`}</div>`;
 }
 
 /* ---------- Menu ---------- */
@@ -449,10 +456,12 @@ function renderMenu(){
 /* ---------- Events ---------- */
 let evFilter='all';
 function renderEvents(){
-  const list=EVENTS.filter(e=>evFilter==='all'||e.kind===evFilter);
+  const ok=e=>evFilter==='all'||e.kind===evFilter;
+  const list=upcoming().filter(ok), old=past().filter(ok);
   const f=list[0];
-  $('#feature-event').innerHTML=f?`<div class="feature-event" style="background:${EV_ART[f.kind]}"><span class="chip">This ${fmt(f.date,{weekday:'long'})}</span><h3>${esc(f.title)}</h3><p>${fmt(f.date,{month:'long',day:'numeric'})} · ${esc(f.desc)}</p></div>`:'';
-  $('#event-list').innerHTML=list.slice(1).map(eventRow).join('');
+  $('#feature-event').innerHTML=f?`<div class="feature-event" style="background:${EV_ART[f.kind]}"><span class="chip">${fmt(f.date,{weekday:'long',month:'short',day:'numeric'})}</span><h3>${esc(f.title)}</h3><p>${esc(f.desc)}</p></div>`:NO_DATES;
+  $('#event-list').innerHTML=list.slice(1).map(eventRow).join('')+(old.length?`<p class="eyebrow" style="margin-top:6px">Recently at the Lion</p>`+old.map(eventRow).join(''):'');
+  $('#ev-updated').textContent=`Events from lionrampantpub.com · checked ${fmt(EV_UPDATED.slice(0,10),{month:'short',day:'numeric'})}`;
 }
 
 /* ---------- Wallet ---------- */
@@ -639,6 +648,10 @@ function clock(){$('#sb-time').textContent=new Intl.DateTimeFormat('en-CA',{time
 window.addEventListener('resize',fit);fit();clock();setInterval(clock,30000);
 
 renderHome();renderMenu();renderEvents();renderWallet();
+/* Pick up the latest synced events when events.json sits next to the page */
+fetch('events.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+  if(d&&Array.isArray(d.events)&&d.events.length){EVENTS=d.events;EV_UPDATED=d.updated||EV_UPDATED;renderHome();renderEvents()}
+}).catch(()=>{});
 go(store.get('tab','home'));
 setInterval(renderOpen,60000);
 })();

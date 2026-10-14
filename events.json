@@ -1,0 +1,60 @@
+{
+  "source": "https://www.lionrampantpub.com/",
+  "updated": "2026-10-14T12:45-07:00",
+  "events": [
+    {
+      "date": "2026-07-31",
+      "title": "Machine Room",
+      "desc": "Fantastic tunes with this duo!",
+      "kind": "live"
+    },
+    {
+      "date": "2026-08-01",
+      "title": "Music Bingo",
+      "desc": "Mits spins the tunes & gives away the prizes!",
+      "kind": "game"
+    },
+    {
+      "date": "2026-08-07",
+      "title": "One Hit Away",
+      "desc": "These guys know how to Rock!",
+      "kind": "live"
+    },
+    {
+      "date": "2026-08-08",
+      "title": "Karaoke Night",
+      "desc": "Mitz hosts a night of amateur music!",
+      "kind": "game"
+    },
+    {
+      "date": "2026-08-14",
+      "title": "Taylor Fance",
+      "desc": "Taylor rocks the place, solo!",
+      "kind": "live"
+    },
+    {
+      "date": "2026-08-15",
+      "title": "Music Bingo",
+      "desc": "Mits spins the tunes & gives away the prizes!",
+      "kind": "game"
+    },
+    {
+      "date": "2026-08-21",
+      "title": "P.A. & The Two Tones",
+      "desc": "Paul & the guys with be #RockinTheRampant, Classic rock-style!",
+      "kind": "live"
+    },
+    {
+      "date": "2026-08-22",
+      "title": "Karaoke Night",
+      "desc": "Mitz hosts a night of amateur music!",
+      "kind": "game"
+    },
+    {
+      "date": "2026-08-28",
+      "title": "Renovation Blues Band",
+      "desc": "Rock & Blues! Gotta love that!",
+      "kind": "live"
+    }
+  ]
+}
