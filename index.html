@@ -82,7 +82,10 @@ body{background:radial-gradient(ellipse at 50% 30%,var(--desk-hi),var(--desk) 70
 .brand{display:flex;align-items:center;gap:10px}
 .brand-name{font-family:var(--display);font-weight:900;font-size:22px;letter-spacing:.02em;text-transform:uppercase;line-height:1}
 .brand-sub{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
-.avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-weight:700;font-size:14px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-weight:700;font-size:14px;flex:0 0 auto}
+.avatar.signin{width:auto;height:36px;border-radius:999px;padding:0 14px 0 10px;display:flex;align-items:center;gap:6px;background:var(--red);color:var(--on-red);font-size:13px;white-space:nowrap}
+.avatar.signin svg{width:18px;height:18px}
+.avatar.me{background:var(--ink);color:var(--bg)}
 
 /* Hero */
 .hero{position:relative;border-radius:26px;overflow:hidden;color:#fff;min-height:250px;display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
@@ -282,7 +285,7 @@ body{background:radial-gradient(ellipse at 50% 30%,var(--desk-hi),var(--desk) 70
             <span class="logo" role="img" aria-label="The Lion Rampant Scottish Pub logo" style="width:52px;height:48px"></span>
             <div><div class="brand-name">The Lion Rampant</div><div class="brand-sub">Scottish Pub · Maple Bay</div></div>
           </div>
-          <button class="avatar" id="home-avatar" aria-label="Account">IS</button>
+          <button class="avatar signin" id="home-avatar" aria-label="Sign in">Sign in</button>
         </div>
 
         <div class="hero">
@@ -547,7 +550,10 @@ function cardHTML(c,attrs=''){
 }
 function renderWallet(){
   const root=$('#wallet-root');
-  $('#home-avatar').textContent=user?user.initials:'?';
+  const av=$('#home-avatar');
+  av.className='avatar '+(user?'me':'signin');
+  av.setAttribute('aria-label',user?`Your account (${user.first})`:'Sign in');
+  av.innerHTML=user?esc(user.initials):'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Sign in';
   if(!user){
     root.innerHTML=`<div class="auth">
       <div class="auth-hero tartan"><span class="logo" style="width:96px;height:89px;position:relative" role="img" aria-label="The Lion Rampant Scottish Pub logo"></span><p class="eyebrow" style="color:#FFE7A0;position:relative">Gift cards</p><h2>Give a round.<br>Keep the change.</h2><p>Sign in to buy gift cards, send them to friends and pay at the bar from your phone.</p></div>
