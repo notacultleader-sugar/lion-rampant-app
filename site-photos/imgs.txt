@@ -1,0 +1,5 @@
+assets/img/about.jpg
+assets/img/cta-bg.jpg
+assets/img/footer-bg.jpg
+assets/img/hero-bg.jpg
+assets/img/testimonials-bg.jpg
