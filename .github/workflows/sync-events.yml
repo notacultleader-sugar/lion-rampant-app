@@ -1,8 +1,8 @@
-name: Sync events from website
+name: Sync events and special hours
 
 on:
   schedule:
-    - cron: "17 */6 * * *"   # every 6 hours
+    - cron: "17 * * * *"   # every hour
   workflow_dispatch:
 
 permissions:
@@ -18,14 +18,19 @@ jobs:
           python-version: "3.12"
       - name: Pull events from lionrampantpub.com
         run: python scripts/sync_events.py
-      - name: Commit if events changed
+        continue-on-error: true
+      - name: Pull special hours from the staff sheet
+        env:
+          SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
+        run: python scripts/sync_special_hours.py
+      - name: Commit if anything changed
         run: |
-          if git diff --quiet -- events.json; then
-            echo "Events unchanged."
+          if git diff --quiet -- events.json special-hours.json; then
+            echo "Nothing changed."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add events.json
-          git commit -m "Sync events from lionrampantpub.com"
+          git add events.json special-hours.json
+          git commit -m "Sync events and special hours"
           git push

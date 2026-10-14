@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   workflow_run:
-    workflows: ["Sync events from website"]
+    workflows: ["Sync events and special hours"]
     types: [completed]
   workflow_dispatch:
 

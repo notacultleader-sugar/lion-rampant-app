@@ -297,6 +297,8 @@ body{background:radial-gradient(ellipse at 50% 30%,var(--desk-hi),var(--desk) 70
           </div>
         </div>
 
+        <div id="home-special" hidden></div>
+
         <div class="quick">
           <button data-go="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 0-3 3-3 7h3v11"/></svg>Menu</button>
           <button data-go="events"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Live music</button>
@@ -372,8 +374,12 @@ body{background:radial-gradient(ellipse at 50% 30%,var(--desk-hi),var(--desk) 70
           <h1 class="page-title">Contact &amp; Hours</h1>
         </div>
         <span class="status-pill" style="background:var(--ink);color:var(--bg)"><span class="dot" id="v-dot"></span><span id="v-open">Open now</span></span>
+        <div class="stack" style="gap:10px" id="visit-special" hidden>
+          <div class="section-head"><h2>Special hours</h2><span class="eyebrow">Holidays &amp; events</span></div>
+          <div class="hours" id="special-list"></div>
+        </div>
         <div class="stack" style="gap:10px">
-          <div class="section-head"><h2>Hours</h2><span class="eyebrow">Kitchen hours below</span></div>
+          <div class="section-head"><h2>Regular hours</h2><span class="eyebrow">Pacific time</span></div>
           <div class="hours" id="hours"></div>
         </div>
         <div class="stack" style="gap:10px">
@@ -461,6 +467,12 @@ let EVENTS=[
 let EV_UPDATED='2026-10-14';
 const todayISO=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver'}).format(new Date());
 const upcoming=()=>EVENTS.filter(e=>e.date>=todayISO());
+/* Holiday and special hours from the staff sheet (special-hours.json, kept fresh by the sync job) */
+let SPECIAL=[];
+const isoAdd=(iso,n)=>{const [y,m,d]=iso.split('-').map(Number);return new Date(Date.UTC(y,m-1,d+n)).toISOString().slice(0,10)};
+const specialFor=iso=>SPECIAL.find(s=>s.date===iso);
+const upcomingSpecial=(days)=>{const t=todayISO(),end=isoAdd(t,days);return SPECIAL.filter(s=>s.date>=t&&s.date<=end)};
+const specialText=s=>s.open?`${s.opens} – ${s.closes}`:'Closed';
 const NO_DATES=`<div class="summary"><b>New dates coming soon</b><p class="note" style="font-size:14px">There's live music every weekend. The pub hasn't posted its next acts on the website yet, and they'll show up here as soon as it does.</p></div>`;
 const EV_ART={live:'linear-gradient(140deg,#C8102E,#5A0716 70%)',game:'linear-gradient(140deg,#1F6F78,#0E2A3A 70%)'};
 
@@ -472,7 +484,14 @@ function pubNow(){
   return {day:days.indexOf(g('weekday')),mins:(+g('hour')%24)*60+(+g('minute'))};
 }
 function openStatus(){
-  const {day,mins}=pubNow();
+  const {day,mins}=pubNow(), t=todayISO(), ys=specialFor(isoAdd(t,-1)), ts=specialFor(t);
+  if(ys&&ys.open&&ys.closesMin>1440&&mins<ys.closesMin-1440)return {open:true,text:`Open till ${ys.closes}${ys.note?' · '+ys.note:''}`};
+  if(ts){
+    const note=ts.note?' · '+ts.note:'';
+    if(!ts.open)return {open:false,text:`Closed today${note}`};
+    if(mins>=ts.opensMin&&mins<ts.closesMin)return {open:true,text:`Open till ${ts.closes}${note}`};
+    return {open:false,text:mins<ts.opensMin?`Opens ${ts.opens} today${note}`:`Closed${note}`};
+  }
   const late=(day===5||day===6), close=late?24*60:21*60, kitchen=late?22*60:20*60+30;
   if(mins>=11*60&&mins<close){
     const k=mins<kitchen?` · kitchen till ${late?'10pm':'8:30pm'}`:' · kitchen closed';
@@ -482,7 +501,17 @@ function openStatus(){
 }
 function renderOpen(){const s=openStatus();$('#open-text').textContent=s.text;$('#open-dot').classList.toggle('closed',!s.open);const v=$('#v-open');if(v){v.textContent=s.text;$('#v-dot').classList.toggle('closed',!s.open)}}
 const HOURS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].map((d,i)=>{const late=i===5||i===6;return {d,open:late?'11am – midnight':'11am – 9pm',kitchen:late?'Kitchen until 10pm':'Kitchen until 8:30pm'}});
+function renderSpecial(){
+  const soon=upcomingSpecial(14), all=upcomingSpecial(366), t=todayISO();
+  const row=s=>`<div class="hrow${s.date===t?' today':''}"><b>${fmt(s.date,{weekday:'short',month:'short',day:'numeric'})}${s.date===t?' · today':''}</b><span>${esc(specialText(s))}</span>${s.note?`<small>${esc(s.note)}</small>`:''}</div>`;
+  const hs=$('#home-special');
+  hs.hidden=!soon.length;
+  hs.innerHTML=soon.length?`<button class="special" data-go="visit" style="background:var(--surface);color:var(--ink);border:2px solid var(--gold);text-align:left;width:100%;grid-template-columns:1fr"><span class="eyebrow">Holiday hours</span>${soon.slice(0,3).map(s=>`<span style="display:flex;justify-content:space-between;gap:10px;font-size:14px"><b>${fmt(s.date,{weekday:'short',month:'short',day:'numeric'})}</b><span>${esc(specialText(s))}${s.note?' · '+esc(s.note):''}</span></span>`).join('')}</button>`:'';
+  $('#visit-special').hidden=!all.length;
+  $('#special-list').innerHTML=all.map(row).join('');
+}
 function renderVisit(){
+  renderSpecial();
   const {day}=pubNow(), order=[1,2,3,4,5,6,0];
   $('#hours').innerHTML=order.map(i=>{const h=HOURS[i];return `<div class="hrow${i===day?' today':''}"><b>${h.d}${i===day?' · today':''}</b><span>${h.open}</span><small>${h.kitchen}${i===5||i===6?' · shuttle from 6pm':''}</small></div>`}).join('');
   renderOpen();
@@ -741,6 +770,9 @@ renderHome();renderMenu();renderEvents();renderWallet();renderVisit();
 /* Pick up the latest synced events when events.json sits next to the page */
 fetch('events.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
   if(d&&Array.isArray(d.events)&&d.events.length){EVENTS=d.events;EV_UPDATED=d.updated||EV_UPDATED;renderHome();renderEvents()}
+}).catch(()=>{});
+fetch('special-hours.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+  if(d&&Array.isArray(d.days)){SPECIAL=d.days;renderVisit();renderOpen()}
 }).catch(()=>{});
 go(store.get('tab','home'));
 setInterval(renderOpen,60000);
