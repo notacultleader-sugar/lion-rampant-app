@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Lion Rampant App</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a phone-shaped app (full-bleed on phones, framed on desktop) with four tabs and slide-up sheets. */
+:root{
+  --bg:#E9EFEE;          /* sea mist */
+  --surface:#FFFFFF;
+  --surface-2:#DCE5E3;
+  --ink:#0F2230;         /* harbour navy */
+  --muted:#557080;
+  --line:#C9D6D4;
+  --red:#C8102E;         /* lion red */
+  --gold:#F2B300;        /* standard gold */
+  --sea:#1F6F78;
+  --ok:#1D8A55;
+  --on-red:#FFFFFF;
+  --desk:#C7D3D1;
+  --display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",Impact,sans-serif;
+  --body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1820;--surface:#13252F;--surface-2:#1B323E;--ink:#E8F0EE;--muted:#8FA9B3;--line:#24404C;
+  --red:#FF4A5C;--gold:#FFC629;--sea:#4FB3BD;--ok:#4CD38E;--on-red:#1A0408;--desk:#050C10;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1820;--surface:#13252F;--surface-2:#1B323E;--ink:#E8F0EE;--muted:#8FA9B3;--line:#24404C;
+  --red:#FF4A5C;--gold:#FFC629;--sea:#4FB3BD;--ok:#4CD38E;--on-red:#1A0408;--desk:#050C10;color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--desk);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;display:flex;align-items:center;justify-content:center;overflow:hidden}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+
+.phone{position:relative;width:100%;height:100%;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+@media (min-width:600px) and (min-height:700px){
+  .phone{width:400px;height:min(860px,calc(100% - 40px));border-radius:44px;border:10px solid #0A0F12;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+}
+.screens{flex:1;position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 28px;-webkit-overflow-scrolling:touch}
+.screen[hidden]{display:none!important}
+.stack{display:flex;flex-direction:column;gap:18px}
+
+/* Tab bar */
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:6px 0;border-radius:12px}
+.tab svg{width:24px;height:24px}
+.tab[aria-selected="true"]{color:var(--red)}
+
+/* Tartan band used as a recurring motif */
+.tartan{background:
+  repeating-linear-gradient(90deg,transparent 0 14px,rgba(242,179,0,.55) 14px 16px,transparent 16px 40px),
+  repeating-linear-gradient(0deg,transparent 0 14px,rgba(242,179,0,.55) 14px 16px,transparent 16px 40px),
+  repeating-linear-gradient(90deg,rgba(15,34,48,.35) 0 8px,transparent 8px 20px),
+  repeating-linear-gradient(0deg,rgba(15,34,48,.35) 0 8px,transparent 8px 20px),
+  #A10D25}
+
+/* Header */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-name{font-family:var(--display);font-weight:900;font-size:22px;letter-spacing:.02em;text-transform:uppercase;line-height:1}
+.brand-sub{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-weight:700;font-size:14px}
+
+/* Hero */
+.hero{position:relative;border-radius:26px;overflow:hidden;color:#fff;min-height:250px;display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+.hero-sky{position:absolute;inset:0;background:linear-gradient(180deg,#F7A541 0%,#E8664A 38%,#7A3C5F 62%,#1B3A4F 63%,#0E2A3A 100%)}
+.hero-sun{position:absolute;left:58%;top:34%;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,#FFE29A 0%,#FFC46A 60%,rgba(255,196,106,0) 72%)}
+.hero-hills{position:absolute;left:0;right:0;top:44%;height:30%}
+.hero-shine{position:absolute;left:0;right:0;top:63%;bottom:0;background:repeating-linear-gradient(180deg,rgba(255,214,140,.0) 0 6px,rgba(255,214,140,.22) 6px 8px);mask-image:linear-gradient(90deg,transparent 35%,#000 55%,#000 70%,transparent 90%);-webkit-mask-image:linear-gradient(90deg,transparent 35%,#000 55%,#000 70%,transparent 90%)}
+.hero-content{position:relative;display:flex;flex-direction:column;gap:6px}
+.status-pill{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;background:#4CD38E;box-shadow:0 0 0 3px rgba(76,211,142,.3)}
+.dot.closed{background:#FF6B6B;box-shadow:0 0 0 3px rgba(255,107,107,.3)}
+.hero h1{font-family:var(--display);font-weight:900;font-size:46px;line-height:.9;text-transform:uppercase;letter-spacing:.01em}
+.hero p{font-size:14px;opacity:.9;max-width:30ch}
+
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.quick button{background:var(--surface);border-radius:18px;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:700}
+.quick svg{width:22px;height:22px;color:var(--red)}
+
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.section-head h2{font-family:var(--display);font-weight:800;font-size:26px;text-transform:uppercase;letter-spacing:.01em;line-height:1}
+.link{color:var(--red);font-weight:700;font-size:13px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+.special{background:var(--gold);color:#1A1200;border-radius:22px;padding:18px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:end}
+.special .eyebrow{color:#5C4400}
+.special h3{font-family:var(--display);font-weight:900;font-size:32px;line-height:.95;text-transform:uppercase}
+.special .price{font-family:var(--display);font-weight:900;font-size:40px;line-height:.9;grid-row:span 2}
+.special p{font-size:13px}
+
+.week{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-inline:-16px;padding-inline:16px;scrollbar-width:none}
+.week::-webkit-scrollbar{display:none}
+.day{flex:0 0 auto;width:112px;background:var(--surface);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:4px;border:2px solid transparent}
+.day.today{border-color:var(--gold)}
+.day b{font-size:13px;line-height:1.2}
+.day span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+.event-row{display:flex;gap:14px;align-items:center;background:var(--surface);border-radius:20px;padding:12px}
+.datebox{flex:0 0 58px;height:64px;border-radius:14px;background:var(--ink);color:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.datebox small{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.datebox strong{font-family:var(--display);font-weight:900;font-size:30px}
+.event-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.event-info h3{font-size:16px;font-weight:700;line-height:1.2}
+.event-info p{font-size:13px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:3px 9px;background:var(--surface-2);color:var(--ink)}
+.chip.red{background:var(--red);color:var(--on-red)}
+.remind{flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;color:var(--muted)}
+.remind svg{width:20px;height:20px}
+.remind[aria-pressed="true"]{background:var(--red);color:var(--on-red)}
+
+.info-card{background:var(--surface);border-radius:20px;padding:16px;display:grid;grid-template-columns:auto 1fr;gap:10px 14px;font-size:14px}
+.info-card dt{color:var(--muted);font-size:13px}
+.info-card dd{margin:0;font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--muted)}
+
+/* Menu */
+.page-title{font-family:var(--display);font-weight:900;font-size:44px;line-height:.9;text-transform:uppercase}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:14px;padding:0 12px}
+.search svg{width:18px;height:18px;color:var(--muted);flex:0 0 auto}
+.search input{flex:1;min-width:0;border:0;background:transparent;padding:12px 0;font:inherit;color:var(--ink)}
+.search input:focus{outline:none}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-inline:-16px;padding-inline:16px;scrollbar-width:none;position:sticky;top:-16px;background:var(--bg);padding-block:8px;z-index:2}
+.chips::-webkit-scrollbar{display:none}
+.cat{flex:0 0 auto;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;background:var(--surface);white-space:nowrap}
+.cat[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.menu-group{display:flex;flex-direction:column;gap:2px}
+.menu-group h3{font-family:var(--display);font-weight:800;font-size:22px;text-transform:uppercase;padding:10px 0 6px;color:var(--red)}
+.item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.item-name{flex:1;min-width:0;font-weight:500}
+.item-name small{display:block;color:var(--muted);font-size:12px;font-weight:400}
+.fav{width:34px;height:34px;display:grid;place-items:center;color:var(--muted);border-radius:50%}
+.fav svg{width:20px;height:20px}
+.fav[aria-pressed="true"]{color:var(--red)}
+.fav[aria-pressed="true"] svg path{fill:currentColor}
+
+/* Events */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-radius:14px;padding:4px;gap:4px}
+.seg button{border-radius:10px;padding:8px 0;font-size:13px;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.feature-event{border-radius:24px;overflow:hidden;color:#fff;position:relative;padding:20px;min-height:200px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px}
+.feature-event .chip{background:var(--gold);color:#1A1200;align-self:flex-start}
+.feature-event h3{font-family:var(--display);font-weight:900;font-size:40px;line-height:.9;text-transform:uppercase;position:relative}
+.feature-event p{position:relative;font-size:14px}
+.feature-event::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 20%,rgba(0,0,0,.65))}
+.feature-event > *{position:relative}
+
+/* Wallet / auth */
+.auth{display:flex;flex-direction:column;gap:12px}
+.auth-hero{border-radius:26px;padding:22px;color:#fff;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+.auth-hero h2{font-family:var(--display);font-weight:900;font-size:38px;line-height:.92;text-transform:uppercase;position:relative}
+.auth-hero p{position:relative;max-width:30ch}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;border-radius:14px;padding:14px 16px;font-weight:700;font-size:15px;width:100%}
+.btn svg{width:20px;height:20px}
+.btn-apple{background:#000;color:#fff}
+.btn-google{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn-primary{background:var(--red);color:var(--on-red)}
+.btn-ghost{background:var(--surface-2);color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.field input,.field textarea{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:12px;font:inherit;width:100%}
+.field textarea{resize:none;min-height:70px}
+.err{color:var(--red);font-size:13px;min-height:1em}
+
+.gcard{position:relative;aspect-ratio:1.586;max-width:100%;border-radius:20px;overflow:hidden;color:#fff;padding:18px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 24px rgba(15,34,48,.18);text-align:left;width:100%}
+.gcard .g-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative}
+.gcard .g-name{font-family:var(--display);font-weight:900;font-size:22px;line-height:1;text-transform:uppercase}
+.gcard .g-bal{position:relative;font-family:var(--display);font-weight:900;font-size:44px;line-height:.9}
+.gcard .g-meta{position:relative;display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;opacity:.9}
+.d-tartan{background-color:#A10D25}
+.d-harbour{background:linear-gradient(160deg,#1F6F78,#0E2A3A 70%)}
+.d-gold{background:linear-gradient(150deg,#FFD24A,#E39B00);color:#1A1200}
+.d-gold .g-meta{opacity:1}
+.wallet-cards{display:flex;flex-direction:column;gap:14px}
+.balance-total{display:flex;justify-content:space-between;align-items:end}
+.balance-total strong{font-family:var(--display);font-weight:900;font-size:42px;line-height:.9;font-variant-numeric:tabular-nums}
+
+/* Sheets */
+.sheet-wrap{position:absolute;inset:0;background:rgba(5,12,16,.5);display:flex;align-items:flex-end;z-index:20;animation:fade .2s ease}
+.sheet{background:var(--bg);width:100%;max-height:92%;overflow-y:auto;border-radius:26px 26px 0 0;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));animation:up .28s cubic-bezier(.2,.8,.2,1)}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sheet-head h2{font-family:var(--display);font-weight:900;font-size:30px;text-transform:uppercase;line-height:1}
+.x{width:34px;height:34px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center}
+.x svg{width:16px;height:16px}
+.designs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.design{aspect-ratio:1.586;border-radius:10px;border:3px solid transparent;overflow:hidden}
+.design[aria-pressed="true"]{border-color:var(--red)}
+.amounts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.amt{background:var(--surface);border-radius:12px;padding:12px 0;font-family:var(--display);font-weight:800;font-size:22px;border:2px solid transparent}
+.amt[aria-pressed="true"]{border-color:var(--red);color:var(--red)}
+.toggle-row{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface);border-radius:14px;padding:4px}
+.toggle-row button{border-radius:10px;padding:9px 0;font-weight:700;font-size:13px;color:var(--muted)}
+.toggle-row button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.summary{background:var(--surface);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.summary div{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.summary .total{font-weight:700;border-top:1px solid var(--line);padding-top:8px}
+.qr-box{background:#fff;border-radius:20px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#0F2230}
+.qr-box svg{width:190px;height:190px;max-width:100%}
+.qr-box code{font-family:var(--mono);font-size:15px;letter-spacing:.12em}
+.tx{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;font-variant-numeric:tabular-nums}
+.tx small{display:block;color:var(--muted);font-size:12px}
+.tx .neg{color:var(--muted)}
+.tx .pos{color:var(--ok);font-weight:700}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.success{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:10px 0}
+.success .tick{width:64px;height:64px;border-radius:50%;background:var(--ok);display:grid;place-items:center;color:#fff}
+.success .tick svg{width:32px;height:32px}
+
+.toast{position:absolute;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:40;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis;animation:fade .2s ease}
+.demo-banner{font-size:11px;text-align:center;color:var(--muted);padding:6px 16px 0}
+
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="phone" id="app">
+  <div class="screens">
+
+    <!-- HOME -->
+    <section class="screen" id="s-home" aria-label="Home">
+      <div class="stack">
+        <div class="topbar">
+          <div class="brand">
+            <svg width="38" height="44" viewBox="0 0 38 44" aria-hidden="true"><path d="M3 3h32v18c0 11-8 17-16 20C11 38 3 32 3 21z" fill="var(--gold)" stroke="var(--red)" stroke-width="3"/><path d="M12 30c1-4 3-6 3-9-2-1-3-3-2-5 1 1 2 1 3 0 0-2 1-4 3-5l2 2 3-1-1 3 2 2-3 1c0 2 1 4 3 6l-2 1-2-2-1 3 2 3h-3l-1-3-2 1v3h-3z" fill="var(--red)"/></svg>
+            <div><div class="brand-name">The Lion Rampant</div><div class="brand-sub">Scottish Pub · Maple Bay</div></div>
+          </div>
+          <button class="avatar" id="home-avatar" aria-label="Account">IS</button>
+        </div>
+
+        <div class="hero">
+          <div class="hero-sky"></div>
+          <div class="hero-sun"></div>
+          <svg class="hero-hills" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true"><path d="M0 70 C40 40 80 30 120 50 S200 20 250 45 S330 30 400 55 V100 H0z" fill="#3B2B4A" opacity=".7"/><path d="M0 85 C60 60 110 70 160 75 S260 60 310 72 S370 80 400 76 V100 H0z" fill="#22303F"/></svg>
+          <div class="hero-shine"></div>
+          <div class="hero-content">
+            <span class="status-pill" id="open-pill"><span class="dot" id="open-dot"></span><span id="open-text">Open now</span></span>
+            <h1>Pints on the<br>water</h1>
+            <p>Oceanfront in Maple Bay. Great food, cold drinks and the best view in the Cowichan Valley.</p>
+          </div>
+        </div>
+
+        <div class="quick">
+          <button data-go="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 0-3 3-3 7h3v11"/></svg>Menu</button>
+          <button data-go="events"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Live music</button>
+          <button id="q-shuttle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M3 11h18M7 17v2M17 17v2"/></svg>Shuttle</button>
+          <button data-go="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 13h18M12 8c-2-4-6-4-6-1s6 1 6 1zm0 0c2-4 6-4 6-1s-6 1-6 1z"/></svg>Gift cards</button>
+        </div>
+
+        <div class="stack" style="gap:10px">
+          <div class="section-head"><h2>Tonight's special</h2><span class="eyebrow" id="today-name"></span></div>
+          <div class="special" id="special-card"></div>
+          <div class="week" id="week"></div>
+        </div>
+
+        <div class="stack" style="gap:10px">
+          <div class="section-head"><h2>Up next</h2><button class="link" data-go="events">All events</button></div>
+          <div id="home-events" class="stack" style="gap:10px"></div>
+        </div>
+
+        <div class="stack" style="gap:10px">
+          <div class="section-head"><h2>Find us</h2></div>
+          <dl class="info-card">
+            <dt>Address</dt><dd>6777 Beaumont Ave, Maple Bay, BC</dd>
+            <dt>Phone</dt><dd>250.746.5422</dd>
+            <dt>Mon–Thu</dt><dd>11am–9pm · kitchen to 8:30</dd>
+            <dt>Fri–Sat</dt><dd>11am–midnight · kitchen to 10</dd>
+            <dt>Sunday</dt><dd>11am–9pm · kitchen to 8:30</dd>
+          </dl>
+          <p class="note">19+ only. No non-service animals, including on the deck.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section class="screen" id="s-menu" aria-label="Menu" hidden>
+      <div class="stack">
+        <div>
+          <p class="eyebrow">Chef's kitchen · local produce</p>
+          <h1 class="page-title">The Menu</h1>
+        </div>
+        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="menu-search" type="search" placeholder="Search fish & chips, wings, wraps…" aria-label="Search the menu"></label>
+        <div class="chips" id="menu-chips" role="group" aria-label="Menu sections"></div>
+        <div id="menu-list" class="stack" style="gap:8px"></div>
+        <p class="note">Prices are on the in-pub menu. Ask your server about celiac-friendly options.</p>
+      </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section class="screen" id="s-events" aria-label="Events" hidden>
+      <div class="stack">
+        <div>
+          <p class="eyebrow">Live music every weekend</p>
+          <h1 class="page-title">What's On</h1>
+        </div>
+        <div class="seg" role="group" aria-label="Filter events">
+          <button aria-pressed="true" data-filter="all">All</button>
+          <button aria-pressed="false" data-filter="live">Live bands</button>
+          <button aria-pressed="false" data-filter="game">Bingo & karaoke</button>
+        </div>
+        <div id="feature-event"></div>
+        <div id="event-list" class="stack" style="gap:10px"></div>
+        <dl class="info-card">
+          <dt>Shuttle</dt><dd>Fri & Sat, 6pm to close. Call 250.746.5422 to book pickup and drop-off.</dd>
+        </dl>
+        <p class="note">Example dates. The acts are from the pub's website listing.</p>
+      </div>
+    </section>
+
+    <!-- WALLET -->
+    <section class="screen" id="s-wallet" aria-label="Gift cards" hidden>
+      <div id="wallet-root"></div>
+    </section>
+  </div>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" aria-selected="true" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>Home</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 3v8a3 3 0 0 0 6 0V3M7 3v18M17 3c-2 0-3 3-3 7h3v11"/></svg>Menu</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="events"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Events</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 13h18M12 8c-2-4-6-4-6-1s6 1 6 1zm0 0c2-4 6-4 6-1s-6 1-6 1z"/></svg>Gift cards</button>
+  </nav>
+  <div id="layer"></div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store={get(k,d){try{const v=localStorage.getItem('lr_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('lr_'+k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- Data (from lionrampantpub.com) ---------- */
+const SPECIALS=[
+  {d:'Sunday',name:'Sunday Brunch',price:'Soon',note:'Brunch is coming soon.'},
+  {d:'Monday',name:'Halibut Night',price:'$23',note:'One piece of halibut & chips. Add a second piece for $11.'},
+  {d:'Tuesday',name:'Beef Dip',price:'$19',note:'The Tuesday classic.'},
+  {d:'Wednesday',name:'Halifax Donair',price:'$19',note:'Halifax-style, sweet sauce and all.'},
+  {d:'Thursday',name:'Reuben',price:'$19',note:'With your choice of side.'},
+  {d:'Friday',name:'Seafood Night',price:'MP',note:'Price varies with the catch.'},
+  {d:'Saturday',name:'Wing Night',price:'$12',note:'A pound of Wings of Song, with a new flavour every week.'}
+];
+const MENU={
+  'Appetizers':['Classic Poutine','Yam Fries & Chipotle Aioli','Nachos','Torpedo Prawns','Calamari','Onion Rings','Cullen Skink Dip','Wings of Song','Tuna Tataki','Scotch Egg','Stuffed Mushroom Caps','The Cluck Stops Here Buffalo Chicken Dip'],
+  'Soups & Salads':['Chicken Cobb Salad','Tuna Cobb Salad','Rampant Salad','Caesar Salad','Daily Homemade Soup','Seafood Chowder'],
+  'Burgers':['Crispy Chicken Burger','Crispy Cod Burger','Lion Burger With Cheese','Bacon Mushroom Burger','Smokehouse Burger','New Black Bean Veggie Burger','Blackened Tuna Burger'],
+  'Wraps & Handhelds':['Chicken Bacon Ranch Wrap','Chicken Caesar Wrap','Southwest Chipotle Chicken Wrap','Teriyaki Chicken & Pineapple Wrap','Fish Tacos','Blackened Tuna Fish Tacos','Chicken Brie & Granny Apple Ciabatta','Classic BLTC','Chipotle Chicken Club'],
+  'Mains':['Fish & Chips','Classic Mac & Cheese','Chicken Fingers','Powerhouse Bowl']
+};
+const TAGS={'Cullen Skink Dip':'A Scottish smoked-haddock favourite','Scotch Egg':'A pub essential','Wings of Song':'Saturday: a pound for $12','Fish & Chips':'The house classic','New Black Bean Veggie Burger':'Vegetarian','Seafood Chowder':'Made in house','Daily Homemade Soup':'Ask what\'s on today'};
+const EVENTS=[
+  {date:'2026-10-16',title:'Machine Room',kind:'live',desc:'Duo · live music on the weekend'},
+  {date:'2026-10-17',title:'Music Bingo',kind:'game',desc:'Name that tune, win prizes'},
+  {date:'2026-10-23',title:'One Hit Away',kind:'live',desc:'Live band'},
+  {date:'2026-10-24',title:'Karaoke Night',kind:'game',desc:'Grab the mic'},
+  {date:'2026-10-30',title:'Taylor Fance',kind:'live',desc:'Solo set'},
+  {date:'2026-10-31',title:'Music Bingo',kind:'game',desc:'Name that tune, win prizes'},
+  {date:'2026-11-06',title:'P.A. & The Two Tones',kind:'live',desc:'Classic rock'},
+  {date:'2026-11-07',title:'Karaoke Night',kind:'game',desc:'Grab the mic'},
+  {date:'2026-11-13',title:'Renovation Blues Band',kind:'live',desc:'Blues'}
+];
+const EV_ART={live:'linear-gradient(140deg,#C8102E,#5A0716 70%)',game:'linear-gradient(140deg,#1F6F78,#0E2A3A 70%)'};
+
+/* ---------- Time / open status (pub time) ---------- */
+function pubNow(){
+  const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Vancouver',weekday:'short',hour:'numeric',minute:'numeric',hour12:false}).formatToParts(new Date());
+  const g=t=>p.find(x=>x.type===t)?.value;
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return {day:days.indexOf(g('weekday')),mins:(+g('hour')%24)*60+(+g('minute'))};
+}
+function openStatus(){
+  const {day,mins}=pubNow();
+  const late=(day===5||day===6), close=late?24*60:21*60, kitchen=late?22*60:20*60+30;
+  if(mins>=11*60&&mins<close){
+    const k=mins<kitchen?` · kitchen till ${late?'10pm':'8:30pm'}`:' · kitchen closed';
+    return {open:true,text:`Open till ${late?'midnight':'9pm'}${k}`};
+  }
+  return {open:false,text:'Closed · opens 11am'};
+}
+function renderOpen(){const s=openStatus();$('#open-text').textContent=s.text;$('#open-dot').classList.toggle('closed',!s.open)}
+
+/* ---------- Home ---------- */
+function renderHome(){
+  renderOpen();
+  const {day}=pubNow(), sp=SPECIALS[day];
+  $('#today-name').textContent=sp.d;
+  $('#special-card').innerHTML=`<span class="eyebrow">${esc(sp.d)} special</span><span class="price">${esc(sp.price)}</span><h3>${esc(sp.name)}</h3><p>${esc(sp.note)}</p>`;
+  const order=[1,2,3,4,5,6,0];
+  $('#week').innerHTML=order.map(i=>{const s=SPECIALS[i];return `<div class="day${i===day?' today':''}"><span class="eyebrow">${s.d.slice(0,3)}</span><b>${esc(s.name)}</b><span>${esc(s.price)}</span></div>`}).join('');
+  $('#home-events').innerHTML=EVENTS.slice(0,2).map(eventRow).join('');
+}
+const fmt=(iso,opt)=>new Date(iso+'T12:00:00').toLocaleDateString('en-CA',opt);
+function eventRow(e){
+  const on=(store.get('remind',[])).includes(e.date+e.title);
+  return `<div class="event-row"><div class="datebox"><small>${fmt(e.date,{month:'short'})}</small><strong>${fmt(e.date,{day:'numeric'})}</strong></div>
+  <div class="event-info"><span class="chip ${e.kind==='live'?'red':''}" style="align-self:flex-start">${e.kind==='live'?'Live':'Game night'}</span><h3>${esc(e.title)}</h3><p>${fmt(e.date,{weekday:'long'})} evening · ${esc(e.desc)}</p></div>
+  <button class="remind" aria-pressed="${on}" aria-label="Remind me about ${esc(e.title)}" data-remind="${esc(e.date+e.title)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/></svg></button></div>`;
+}
+
+/* ---------- Menu ---------- */
+let menuCat='All';
+function renderMenu(){
+  const cats=['All','Favourites',...Object.keys(MENU)];
+  $('#menu-chips').innerHTML=cats.map(c=>`<button class="cat" aria-pressed="${c===menuCat}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+  const q=$('#menu-search').value.trim().toLowerCase(), favs=store.get('favs',[]);
+  let html='';
+  for(const [cat,items] of Object.entries(MENU)){
+    if(menuCat!=='All'&&menuCat!=='Favourites'&&menuCat!==cat)continue;
+    const list=items.filter(n=>(!q||n.toLowerCase().includes(q))&&(menuCat!=='Favourites'||favs.includes(n)));
+    if(!list.length)continue;
+    html+=`<div class="menu-group"><h3>${esc(cat)}</h3>${list.map(n=>`<div class="item"><div class="item-name">${esc(n)}${TAGS[n]?`<small>${esc(TAGS[n])}</small>`:''}</div><button class="fav" aria-pressed="${favs.includes(n)}" aria-label="Favourite ${esc(n)}" data-fav="${esc(n)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.5-9-9a4.5 4.5 0 0 1 9-2 4.5 4.5 0 0 1 9 2c-2 4.5-9 9-9 9z"/></svg></button></div>`).join('')}</div>`;
+  }
+  $('#menu-list').innerHTML=html||`<p class="note">${menuCat==='Favourites'?'Tap the heart on any dish to save it here.':'Nothing matches that search.'}</p>`;
+}
+
+/* ---------- Events ---------- */
+let evFilter='all';
+function renderEvents(){
+  const list=EVENTS.filter(e=>evFilter==='all'||e.kind===evFilter);
+  const f=list[0];
+  $('#feature-event').innerHTML=f?`<div class="feature-event" style="background:${EV_ART[f.kind]}"><span class="chip">This ${fmt(f.date,{weekday:'long'})}</span><h3>${esc(f.title)}</h3><p>${fmt(f.date,{month:'long',day:'numeric'})} · ${esc(f.desc)}</p></div>`:'';
+  $('#event-list').innerHTML=list.slice(1).map(eventRow).join('');
+}
+
+/* ---------- Wallet ---------- */
+let user=store.get('user',null);
+let cards=store.get('cards',null);
+if(!cards){cards=[{id:'LR-4821-7730',design:'d-tartan',balance:50,original:50,from:'Example card',to:'You',msg:'Happy birthday! First round is on me.',history:[{t:'Gift received',d:'Sep 28',a:50}],example:true}];}
+function save(){store.set('cards',cards);store.set('user',user)}
+const DESIGNS=[{id:'d-tartan',name:'Tartan'},{id:'d-harbour',name:'Harbour'},{id:'d-gold',name:'Lion Gold'}];
+const money=n=>'$'+n.toFixed(2).replace(/\.00$/,'');
+
+function cardHTML(c,attrs=''){
+  return `<button class="gcard ${c.design}${c.design==='d-tartan'?' tartan':''}" ${attrs}>
+    <div class="g-top"><span class="g-name">Lion Rampant<br>Gift Card</span>${c.example?'<span class="chip">Example</span>':''}</div>
+    <div class="g-bal">${money(c.balance)}</div>
+    <div class="g-meta"><span>${esc(c.id)}</span><span>${c.from?esc(c.from):''}</span></div></button>`;
+}
+function renderWallet(){
+  const root=$('#wallet-root');
+  $('#home-avatar').textContent=user?user.initials:'?';
+  if(!user){
+    root.innerHTML=`<div class="auth">
+      <div class="auth-hero tartan"><p class="eyebrow" style="color:#FFE7A0;position:relative">Gift cards</p><h2>Give a round.<br>Keep the change.</h2><p>Sign in to buy gift cards, send them to friends and pay at the bar from your phone.</p></div>
+      <button class="btn btn-apple" data-auth="apple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9s-2-.9-3.3-.9c-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.3.8c1.4 0 2.3-1.2 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.8-1.1-2.8-4.3zM13.9 5.2c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>Continue with Apple</button>
+      <button class="btn btn-google" data-auth="google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9c-.3 1.4-1 2.5-2.2 3.3v2.7h3.6c2-1.9 3.2-4.7 3.2-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8C3.9 20.6 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.8 14.2c-.2-.7-.4-1.4-.4-2.2s.1-1.5.4-2.2V7H2.1C1.4 8.5 1 10.2 1 12s.4 3.5 1.1 5l3.7-2.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2C17.5 2.1 15 1 12 1 7.7 1 3.9 3.4 2.1 7l3.7 2.8c.9-2.6 3.3-4.4 6.2-4.4z"/></svg>Continue with Google</button>
+      <div class="divider">or use email</div>
+      <form id="email-form" class="auth" novalidate>
+        <div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email" placeholder="you@example.com"></div>
+        <div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="At least 6 characters"></div>
+        <p class="err" id="auth-err"></p>
+        <button class="btn btn-primary" type="submit">Sign in with email</button>
+      </form>
+      <p class="note" style="text-align:center">Prototype: sign-in is simulated and nothing leaves this page.</p></div>`;
+    return;
+  }
+  const total=cards.reduce((s,c)=>s+c.balance,0);
+  root.innerHTML=`<div class="stack">
+    <div class="topbar"><div><p class="eyebrow">Signed in with ${esc(user.via)}</p><h1 class="page-title" style="font-size:38px">Hi, ${esc(user.first)}</h1></div><button class="link" id="signout">Sign out</button></div>
+    <div class="balance-total"><div><p class="eyebrow">Total balance</p><strong>${money(total)}</strong></div><span class="note">${cards.length} card${cards.length===1?'':'s'}</span></div>
+    <div class="row2"><button class="btn btn-primary" id="buy">Buy a gift card</button><button class="btn btn-ghost" id="add-code">Add a code</button></div>
+    <div class="wallet-cards">${cards.map((c,i)=>cardHTML(c,`data-card="${i}" aria-label="Open card ${esc(c.id)}"`)).join('')||'<p class="note">No cards yet. Buy one for yourself or a friend.</p>'}</div>
+    <p class="note">Tap a card to pay at the bar. Payments are simulated in this prototype.</p></div>`;
+}
+
+/* ---------- Sheets ---------- */
+function openSheet(title,body,onMount){
+  $('#layer').innerHTML=`<div class="sheet-wrap" id="sw"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="grab"></div><div class="sheet-head"><h2>${esc(title)}</h2><button class="x" id="close-sheet" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div id="sheet-body">${body}</div></div></div>`;
+  $('#close-sheet').onclick=closeSheet;
+  $('#sw').onclick=e=>{if(e.target.id==='sw')closeSheet()};
+  onMount&&onMount();
+}
+function closeSheet(){$('#layer').innerHTML=''}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;$('#app').appendChild(t);setTimeout(()=>t.remove(),2200)}
+
+function fakeAuth(via,email){
+  const name=via==='Apple'?'Ian Smith':via==='Google'?'Ian Smith':(email.split('@')[0].replace(/[._]/g,' ')||'Friend');
+  const first=name.split(' ')[0].replace(/^./,c=>c.toUpperCase());
+  const initials=name.split(' ').map(s=>s[0]||'').join('').slice(0,2).toUpperCase();
+  openSheet(`Continue with ${via}`,`<div class="success"><div class="tick" style="background:var(--ink)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="8" stroke-dasharray="30 60"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur=".8s" repeatCount="indefinite"/></circle></svg></div><p>Signing you in…</p></div>`);
+  setTimeout(()=>{user={via,first,initials};save();closeSheet();renderWallet();toast(`Signed in as ${first}`)},900);
+}
+
+let buy={design:'d-tartan',amount:50,who:'me'};
+function buySheet(){
+  const b=buy;
+  openSheet('Buy a gift card',`<div class="stack" style="gap:16px">
+    <div id="preview">${cardHTML({id:'LR-NEW',design:b.design,balance:b.amount,from:b.who==='me'?'':'A gift'})}</div>
+    <div class="field"><label>Design</label><div class="designs">${DESIGNS.map(d=>`<button class="design ${d.id}${d.id==='d-tartan'?' tartan':''}" aria-pressed="${d.id===b.design}" data-design="${d.id}" aria-label="${d.name}"></button>`).join('')}</div></div>
+    <div class="field"><label>Amount</label><div class="amounts">${[25,50,75,100].map(a=>`<button class="amt" aria-pressed="${a===b.amount}" data-amt="${a}">$${a}</button>`).join('')}</div></div>
+    <div class="field"><label>Who's it for?</label><div class="toggle-row"><button aria-pressed="${b.who==='me'}" data-who="me">For me</button><button aria-pressed="${b.who==='friend'}" data-who="friend">Send to a friend</button></div></div>
+    <div id="friend-fields" class="stack" style="gap:12px" ${b.who==='me'?'hidden':''}>
+      <div class="field"><label for="f-name">Their name</label><input id="f-name" placeholder="Alex"></div>
+      <div class="field"><label for="f-email">Their email</label><input id="f-email" type="email" placeholder="alex@example.com"></div>
+      <div class="field"><label for="f-msg">Message</label><textarea id="f-msg" placeholder="Pints on me at the Lion."></textarea></div>
+    </div>
+    <p class="err" id="buy-err"></p>
+    <div class="summary"><div><span>Gift card</span><span>${money(b.amount)}</span></div><div><span>Fees</span><span>$0</span></div><div class="total"><span>Total</span><span>${money(b.amount)}</span></div></div>
+    <button class="btn btn-apple" id="pay-apple"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9s-2-.9-3.3-.9c-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.3.8c1.4 0 2.3-1.2 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.8-1.1-2.8-4.3zM13.9 5.2c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>Pay ${money(b.amount)}</button>
+    <button class="btn btn-ghost" id="pay-card">Pay with card ending 4242</button>
+    <p class="note" style="text-align:center">Simulated checkout. No payment is taken.</p></div>`,()=>{
+      $('#sheet-body').onclick=e=>{
+        const t=e.target.closest('button');if(!t)return;
+        if(t.dataset.design){buy.design=t.dataset.design;keepFriend();buySheet()}
+        else if(t.dataset.amt){buy.amount=+t.dataset.amt;keepFriend();buySheet()}
+        else if(t.dataset.who){buy.who=t.dataset.who;keepFriend();buySheet()}
+        else if(t.id==='pay-apple'||t.id==='pay-card')pay(t.id==='pay-apple'?'Apple Pay':'Visa 4242');
+      };
+      if(buy.f){$('#f-name').value=buy.f.n;$('#f-email').value=buy.f.e;$('#f-msg').value=buy.f.m}
+  });
+}
+function keepFriend(){const n=$('#f-name');if(n)buy.f={n:n.value,e:$('#f-email').value,m:$('#f-msg').value}}
+function pay(method){
+  keepFriend();
+  if(buy.who==='friend'){
+    const f=buy.f||{};
+    if(!f.n||!/^\S+@\S+\.\S+$/.test(f.e||'')){$('#buy-err').textContent='Add your friend\'s name and a valid email so we know where to send it.';return}
+  }
+  const id='LR-'+Math.floor(1000+Math.random()*9000)+'-'+Math.floor(1000+Math.random()*9000);
+  const today=new Date().toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+  $('#sheet-body').innerHTML=`<div class="success"><div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></div>
+    <h2 style="font-family:var(--display);font-size:30px;text-transform:uppercase">${buy.who==='me'?'Card added':'Gift sent'}</h2>
+    <p>${buy.who==='me'?`${money(buy.amount)} is in your wallet, ready to use at the bar.`:`We'd email ${esc(buy.f.n)} at ${esc(buy.f.e)} with your ${money(buy.amount)} card. (Simulated: no email is sent.)`}</p>
+    <p class="note">Paid with ${esc(method)}</p><button class="btn btn-primary" id="done">Done</button></div>`;
+  if(buy.who==='me'){cards.unshift({id,design:buy.design,balance:buy.amount,original:buy.amount,from:'',history:[{t:'Purchased',d:today,a:buy.amount}]});save()}
+  else{const s=store.get('sent',[]);s.push({id,to:buy.f.n,amount:buy.amount});store.set('sent',s)}
+  buy={design:'d-tartan',amount:50,who:'me'};
+  $('#done').onclick=()=>{closeSheet();renderWallet()};
+}
+
+function qrSVG(seed){
+  let h=0;for(const c of seed)h=(h*31+c.charCodeAt(0))>>>0;
+  const rnd=()=>{h^=h<<13;h>>>=0;h^=h>>17;h^=h<<5;h>>>=0;return h/4294967296};
+  const N=25;let r='';
+  const finder=(x,y)=>`<rect x="${x}" y="${y}" width="7" height="7" fill="#0F2230"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3" fill="#0F2230"/>`;
+  const inF=(x,y)=>(x<8&&y<8)||(x>N-9&&y<8)||(x<8&&y>N-9);
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){if(!inF(x,y)&&rnd()>.52)r+=`<rect x="${x}" y="${y}" width="1" height="1"/>`}
+  return `<svg viewBox="-1 -1 ${N+2} ${N+2}" shape-rendering="crispEdges" role="img" aria-label="Scan code"><rect x="-1" y="-1" width="${N+2}" height="${N+2}" fill="#fff"/><g fill="#0F2230">${r}</g>${finder(0,0)}${finder(N-7,0)}${finder(0,N-7)}</svg>`;
+}
+function cardSheet(i){
+  const c=cards[i];
+  openSheet('Pay at the bar',`<div class="stack" style="gap:16px">
+    ${cardHTML(c,'tabindex="-1"')}
+    <div class="qr-box">${qrSVG(c.id)}<code>${esc(c.id)}</code><span style="font-size:13px">Show this to your server to pay</span></div>
+    ${c.msg?`<div class="summary"><span class="eyebrow">Message</span><p>"${esc(c.msg)}"</p></div>`:''}
+    <div class="field"><label>Try it: settle a tab</label><div class="amounts">${[12,19,23,35].map(a=>`<button class="amt" data-spend="${a}" ${a>c.balance?'disabled':''}>$${a}</button>`).join('')}</div></div>
+    <button class="btn btn-ghost" id="wallet-add">Add to Apple Wallet</button>
+    <div><p class="eyebrow" style="margin-bottom:4px">Activity</p>${c.history.slice().reverse().map(h=>`<div class="tx"><span>${esc(h.t)}<small>${esc(h.d)}</small></span><span class="${h.a>0?'pos':'neg'}">${h.a>0?'+':'−'}${money(Math.abs(h.a))}</span></div>`).join('')}</div></div>`,()=>{
+      $('#sheet-body').onclick=e=>{
+        const t=e.target.closest('button');if(!t)return;
+        if(t.dataset.spend){const a=+t.dataset.spend;if(a>c.balance)return;c.balance-=a;c.history.push({t:'Bar tab · The Lion Rampant',d:new Date().toLocaleDateString('en-CA',{month:'short',day:'numeric'}),a:-a});save();cardSheet(i);renderWallet();toast(`Paid ${money(a)} · ${money(c.balance)} left`)}
+        if(t.id==='wallet-add')toast('Added to Wallet (simulated)');
+      };
+  });
+}
+function addCodeSheet(){
+  openSheet('Add a code',`<form id="code-form" class="stack" style="gap:12px" novalidate><div class="field"><label for="code-in">Gift card code</label><input id="code-in" placeholder="LR-0000-0000" autocomplete="off"></div><p class="err" id="code-err"></p><button class="btn btn-primary" type="submit">Add card</button><p class="note">Try LR-2025-1234 to add a $25 example card.</p></form>`,()=>{
+    $('#code-form').onsubmit=e=>{e.preventDefault();const v=$('#code-in').value.trim().toUpperCase();
+      if(!/^LR-\d{4}-\d{4}$/.test(v)){$('#code-err').textContent='Codes look like LR-1234-5678. Check the email or card and try again.';return}
+      if(cards.some(c=>c.id===v)){$('#code-err').textContent='That card is already in your wallet.';return}
+      cards.push({id:v,design:'d-harbour',balance:25,original:25,from:'Added code',history:[{t:'Code added',d:new Date().toLocaleDateString('en-CA',{month:'short',day:'numeric'}),a:25}]});save();closeSheet();renderWallet();toast('Card added')};
+  });
+}
+
+/* ---------- Navigation & events ---------- */
+function go(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===tab));
+  document.querySelectorAll('.screen').forEach(s=>s.hidden=s.id!=='s-'+tab);
+  $('#s-'+tab).scrollTop=0;
+  store.set('tab',tab);
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.tab)return go(t.dataset.tab);
+  if(t.dataset.go)return go(t.dataset.go);
+  if(t.id==='home-avatar')return go('wallet');
+  if(t.id==='q-shuttle')return toast('Shuttle Fri & Sat from 6pm · call 250.746.5422');
+  if(t.dataset.cat){menuCat=t.dataset.cat;return renderMenu()}
+  if(t.dataset.fav){const f=store.get('favs',[]),n=t.dataset.fav,i=f.indexOf(n);i<0?f.push(n):f.splice(i,1);store.set('favs',f);t.setAttribute('aria-pressed',i<0);if(menuCat==='Favourites')renderMenu();return}
+  if(t.dataset.remind){const r=store.get('remind',[]),k=t.dataset.remind,i=r.indexOf(k);i<0?r.push(k):r.splice(i,1);store.set('remind',r);document.querySelectorAll(`[data-remind="${CSS.escape(k)}"]`).forEach(b=>b.setAttribute('aria-pressed',i<0));toast(i<0?'We\'ll remind you on the day':'Reminder removed');return}
+  if(t.dataset.filter){evFilter=t.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',b===t));return renderEvents()}
+  if(t.dataset.auth)return fakeAuth(t.dataset.auth==='apple'?'Apple':'Google');
+  if(t.id==='signout'){user=null;save();renderWallet();return toast('Signed out')}
+  if(t.id==='buy')return buySheet();
+  if(t.id==='add-code')return addCodeSheet();
+  if(t.dataset.card!==undefined&&!t.closest('.sheet'))return cardSheet(+t.dataset.card);
+});
+document.addEventListener('submit',e=>{
+  if(e.target.id!=='email-form')return;e.preventDefault();
+  const em=$('#em').value.trim(),pw=$('#pw').value;
+  if(!/^\S+@\S+\.\S+$/.test(em))return $('#auth-err').textContent='Enter a valid email address.';
+  if(pw.length<6)return $('#auth-err').textContent='Passwords need at least 6 characters.';
+  fakeAuth('email',em);
+});
+$('#menu-search').addEventListener('input',renderMenu);
+
+renderHome();renderMenu();renderEvents();renderWallet();
+go(store.get('tab','home'));
+setInterval(renderOpen,60000);
+})();
+</script>
+
+</body>
+</html>
