@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1820">
 <link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
 <title>Lion Rampant App</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -56,6 +58,12 @@ body{background:radial-gradient(ellipse at 50% 30%,var(--desk-hi),var(--desk) 70
 .statusbar svg{height:12px;width:auto;fill:var(--ink)}
 .island{position:absolute;left:50%;top:11px;transform:translateX(-50%);width:124px;height:36px;border-radius:20px;background:#000;z-index:50}
 .homebar{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:136px;height:5px;border-radius:3px;background:var(--ink);opacity:.85;z-index:50;pointer-events:none}
+/* On a real phone: drop the frame and fill the screen */
+html.bare body{background:var(--bg)}
+html.bare .stage,html.bare .device{position:static;width:100%!important;height:100%!important;padding:0;border-radius:0;background:none;box-shadow:none;transform:none!important}
+html.bare .device::before,html.bare .device::after,html.bare .island,html.bare .statusbar,html.bare .homebar,html.bare .caption{display:none}
+html.bare .phone{width:100%;height:100%;border-radius:0}
+html.bare .screen{padding-top:12px}
 .caption{position:absolute;left:0;right:0;text-align:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--cap)}
 .screens{flex:1;position:relative;overflow:hidden}
 .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:8px 16px 28px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -756,7 +764,11 @@ document.addEventListener('submit',e=>{
 $('#menu-search').addEventListener('input',renderMenu);
 
 /* ---------- Simulated phone: fit to window, live clock ---------- */
+const bareMQ=window.matchMedia('(max-width: 599px), (pointer: coarse) and (max-width: 900px)');
 function fit(){
+  const bare=bareMQ.matches;
+  document.documentElement.classList.toggle('bare',bare);
+  if(bare){$('#stage').style.width=$('#stage').style.height='';$('#device').style.transform='';return}
   const W=window.innerWidth,H=window.innerHeight,dw=417,dh=876,cap=28;
   const s=Math.min((W-24)/dw,(H-24-cap)/dh,1);
   const st=$('#stage');st.style.width=dw*s+'px';st.style.height=dh*s+cap+'px';
