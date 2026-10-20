@@ -1,59 +1,59 @@
 {
   "source": "https://www.lionrampantpub.com/",
-  "updated": "2026-10-14T12:45-07:00",
+  "updated": "2026-10-20T04:39-07:00",
   "events": [
     {
-      "date": "2026-07-31",
-      "title": "Machine Room",
-      "desc": "Fantastic tunes with this duo!",
+      "date": "2026-10-23",
+      "title": "The 11th Hour",
+      "desc": "MUSIC BINGO",
       "kind": "live"
     },
     {
-      "date": "2026-08-01",
+      "date": "2026-10-24",
       "title": "Music Bingo",
-      "desc": "Mits spins the tunes & gives away the prizes!",
+      "desc": "Wharf Rats - Halloween!",
       "kind": "game"
     },
     {
-      "date": "2026-08-07",
+      "date": "2026-10-30",
+      "title": "Wharf Rats - Halloween!",
+      "desc": "KARAOKE NIGHT",
+      "kind": "live"
+    },
+    {
+      "date": "2026-10-31",
+      "title": "Karaoke Night",
+      "desc": "Johnny Carson Band",
+      "kind": "game"
+    },
+    {
+      "date": "2026-11-06",
+      "title": "Johnny Carson Band",
+      "desc": "MUSIC BINGO",
+      "kind": "live"
+    },
+    {
+      "date": "2026-11-07",
+      "title": "Music Bingo",
+      "desc": "One Hit Away",
+      "kind": "game"
+    },
+    {
+      "date": "2026-11-13",
       "title": "One Hit Away",
-      "desc": "These guys know how to Rock!",
+      "desc": "KARAOKE NIGHT",
       "kind": "live"
     },
     {
-      "date": "2026-08-08",
+      "date": "2026-11-14",
       "title": "Karaoke Night",
-      "desc": "Mitz hosts a night of amateur music!",
+      "desc": "Tom Morrissey & Friends",
       "kind": "game"
     },
     {
-      "date": "2026-08-14",
-      "title": "Taylor Fance",
-      "desc": "Taylor rocks the place, solo!",
-      "kind": "live"
-    },
-    {
-      "date": "2026-08-15",
-      "title": "Music Bingo",
-      "desc": "Mits spins the tunes & gives away the prizes!",
-      "kind": "game"
-    },
-    {
-      "date": "2026-08-21",
-      "title": "P.A. & The Two Tones",
-      "desc": "Paul & the guys with be #RockinTheRampant, Classic rock-style!",
-      "kind": "live"
-    },
-    {
-      "date": "2026-08-22",
-      "title": "Karaoke Night",
-      "desc": "Mitz hosts a night of amateur music!",
-      "kind": "game"
-    },
-    {
-      "date": "2026-08-28",
-      "title": "Renovation Blues Band",
-      "desc": "Rock & Blues! Gotta love that!",
+      "date": "2026-11-20",
+      "title": "Tom Morrissey & Friends",
+      "desc": "",
       "kind": "live"
     }
   ]
